@@ -1,13 +1,15 @@
 
-#Curso R 
 
 #Directorio de trabajo 
+#poner el directorio de trabajo en el botón de session, to source file location
 
 #instalamos los paquetes
 install.packages("openxlsx")
 install.packages("RMySQL")
+install.packages("DBI")
 
 #cargamos las dependencias 
+library(DBI)
 library(RMySQL)
 library(openxlsx)
 
@@ -16,13 +18,10 @@ library(openxlsx)
 
 #Requisitos del excel, estar en forma tabular (limpio)
 #leemos el archivo excel 
-read.xlsx("netflix_list.xlsx")# leer el excel 
-read.xlsx("netflix_list.xlsx", 2) #leer una hoja en específico
-read.xlsx("netflix_list.xlsx", sheet=2, col_names = TRUE)
-
 #lo podemos poner el un objeto 
-datos <- read.xlsx("netflix_list.xlsx")
 
+prueba1<-read.xlsx("netflix_list.xlsx")# leer el excel 
+prueba2<-read.xlsx("netflix_list.xlsx", 2) #leer una hoja en específico
 
 #Mysql 
 #Funciones
@@ -40,24 +39,26 @@ con <- dbConnect(RMySQL::MySQL(),
                  password = "AlephDS#040722!")
 dbListTables(con) #me dice qué tablas tengo ahí 
 
-tabla <- dbReadTable(con, "netflix_list")
+tabla <- dbReadTable(con, "netflix_list") #me lee la tabla que le estoy pidiendo
 
 #mandar una consulta para obtener solo una columna
 my_table <- dbGetQuery(con, "SELECT popular_rank, count(*) as rank FROM netflix_list") #me cuenta los registros
-my_table
+my_table #aquí observamos nuestro objeto 
 
 my_table2 <- dbGetQuery(con, "SELECT popular_rank FROM netflix_list") #me trae una columna 
-my_table2
+my_table2 #aquí observamos nuestro objeto 
 
 dbDisconnect(con) #para desconectarse
 
 #Ahora hagamos un excel con lo que ya trabajamos
 
 #Función 
-?write.xlsx()
+?write.xlsx #para hcer un excel 
+?write.csv #para hacer un csv
 
-write.xlsx(my_table2, "nuevoArchivo") 
-
+write.xlsx(my_table2, "nombre_del_archivo.xlsx") #nos crea un archivo excel de nuestros datos que están en  my_table2 
+write.xlsx(my_table2, "nombre_del_archivo.xlsx",overwrite = TRUE) #escribe sobre el archivo que teníamos, nuestros datos que están en  my_table2
+write.csv(my_table2, "nombre_del_archivo.csv")#nos crea un archivo csv de nuestros datos que están en  my_table2
 
 
 
