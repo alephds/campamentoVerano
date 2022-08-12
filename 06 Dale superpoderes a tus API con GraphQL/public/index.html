@@ -1,0 +1,138 @@
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>USDMXN</title>
+</head>
+
+<body style="background-color: #ebebeb;">
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12 h5 mb-5">Gráfico de velas - USD/MXN - Teporalidad 1 minuto</div>
+            <div class="col-12 mb-3">Ingresa el rango de fechas para las 2 gráficas de velas</div>
+            <div class="col-lg-4 mb-3">
+                <label class="text-muted">Fecha inicial 1</label>
+                <input value="2020-02-02" type="date" class="form-control form-control-sm" id="inputFechaInicial">
+            </div>
+            <div class="col-lg-4 mb-3">
+                <label class="text-muted">Fecha final 1</label>
+                <input value="2020-02-03" type="date" class="form-control form-control-sm" id="inputFechaFinal">
+            </div>
+            <div class="col-lg-4"></div>
+            <div class="col-lg-4 mb-3">
+                <label class="text-muted">Fecha inicial 2</label>
+                <input value="2020-02-05" type="date" class="form-control form-control-sm" id="inputFechaInicial2">
+            </div>
+            <div class="col-lg-4 mb-3">
+                <label class="text-muted">Fecha final 2</label>
+                <input value="2020-02-06" type="date" class="form-control form-control-sm" id="inputFechaFinal2">
+            </div>
+            <div class="col-lg-4 mb-4">
+                <label>&nbsp;</label>
+                <button class="btn btn-primary btn-sm w-100" onclick="consultarVelas()" id="btnConsulta">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="spinnerConsulta"
+                        style="display: none;"></span>
+                    Consultar ambos rangos de fechas
+                </button>
+            </div>
+            <div class="col-12 mb-5">
+                <div class="card">
+                    <div class="card-header">Gráfica 1</div>
+                    <div class="card-body">
+                        <div id="grafica1"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 mb-5">
+                <div class="card">
+                    <div class="card-header">Gráfica 2</div>
+                    <div class="card-body">
+                        <div id="grafica2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function unpack(rows, key) {
+            return rows.map(function (row) {
+                return row[key];
+            });
+        }
+
+        function mostrarBotonEnProgreso() {
+            document.getElementById('btnConsulta').disabled = true;
+            document.getElementById('spinnerConsulta').style.display = 'inline-block';
+        }
+
+        function quitarBotonEnProgreso() {
+            document.getElementById('btnConsulta').disabled = false;
+            document.getElementById('spinnerConsulta').style.display = 'none';
+        }
+
+        async function consultarVelasParaUnaGrafica(fechaInicial, fechaFinal, idDivGrafica) {
+            const url = `api/history/${fechaInicial}/${fechaFinal}`;
+
+            const response = await axios.get(url);
+            const rows = response.data;
+
+            const trace = {
+                x: unpack(rows, 'fecha'),
+                close: unpack(rows, 'close'),
+                high: unpack(rows, 'high'),
+                low: unpack(rows, 'low'),
+                open: unpack(rows, 'open'),
+
+                // cutomise colors
+                increasing: { line: { color: '#52BE80' } },
+                decreasing: { line: { color: '#CD6155' } },
+
+                type: 'candlestick',
+                xaxis: 'x',
+                yaxis: 'y'
+            };
+
+            const data = [trace];
+
+            const layout = {
+                dragmode: 'zoom',
+                showlegend: false,
+                xaxis: {
+                    rangeslider: {
+                        visible: false
+                    }
+                }
+            };
+
+            Plotly.newPlot(idDivGrafica, data, layout, {
+                responsive: true,
+                displayModeBar: false
+            });
+        }
+
+        async function consultarVelas() {
+            mostrarBotonEnProgreso();
+
+            let fechaInicial = document.getElementById('inputFechaInicial').value
+            let fechaFinal = document.getElementById('inputFechaFinal').value;
+            await consultarVelasParaUnaGrafica(fechaInicial, fechaFinal, 'grafica1');
+
+            fechaInicial = document.getElementById('inputFechaInicial2').value
+            fechaFinal = document.getElementById('inputFechaFinal2').value;
+            await consultarVelasParaUnaGrafica(fechaInicial, fechaFinal, 'grafica2');
+
+            quitarBotonEnProgreso();
+        }
+
+        consultarVelas();
+    </script>
+</body>
+
+</html>
